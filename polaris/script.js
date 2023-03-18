@@ -1,24 +1,61 @@
-AFRAME.registerComponent('tap-handler', {
-  init: function () {
-    this.el.addEventListener('click', (event) => {
-      // Get the location of the tap
-      const tapPosition = event.detail.intersection.point;
+let net;
+let classifier;
+let video;
+let label;
+let modelReady = false;
+let knnReady = false;
+let predicting = false;
 
-      // Check if there is a stored location that matches the tap location
-      const match = this.findMatch(tapPosition);
+const setup = async () => {
+  video = document.createElement('video');
+  video.width = 224;
+  video.height = 224;
+  video.autoplay = true;
+  video.muted = true;
+  video.playsinline = true;
+  document.body.appendChild(video);
 
-      // If there is a match, display the 3D model at the tap location
-      if (match) {
-        const model = document.createElement('a-entity');
-        model.setAttribute('gltf-model', 'path/to/model.gltf');
-        model.setAttribute('position', tapPosition);
-        this.el.sceneEl.appendChild(model);
-      }
+  net = await mobilenet.load();
+  classifier = knnClassifier.create();
+
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
     });
-  },
-  findMatch: function (position) {
-    // Check if there is a stored location that matches the tap location
-    // This could be done using a database or by checking against a list of stored locations
-    return false;
+
+  net.predict(video).then(() => {
+    modelReady = true;
+  });
+
+  knnReady = true;
+};
+
+const update = async () => {
+  if (modelReady && knnReady) {
+    const activation = net.infer(video, 'conv_preds');
+    const result = await classifier.predictClass(activation);
+
+    label = result.label;
+    updateKNN();
+    updateLabel();
   }
-});
+
+  requestAnimationFrame(update);
+};
+
+const updateKNN = () => {
+  if (label && predicting) {
+    classifier.addExample(net.infer(video, 'conv_preds'), label);
+    predicting = false;
+  }
+};
+
+const updateLabel = () => {
+  const labelElement
+const updateLabel = () => {
+  const labelElement = document.querySelector('#label');
+  if (labelElement && label) {
+    labelElement.innerHTML = `Label: ${label}`;
+  }
+};
