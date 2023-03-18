@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>AR Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
-    <script src="https://unpkg.com/ar.js/aframe/build/aframe-ar.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>
-  </head>
-  <body>
-    <a-scene embedded arjs="sourceType: webcam;">
-      <a-entity tap-handler>
-        <!-- Add any camera or lighting components here -->
-      </a-entity>
-    </a-scene>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>AR 3D Model Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/jeromeetienne/AR.js/2.3.0/aframe/build/aframe-ar.css">
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.3.0/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.7.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.0.4/dist/mobilenet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/knn-classifier@1.1.2/dist/knn-classifier.min.js"></script>
+  <script src="./main.js"></script>
+</head>
+<body>
+  <a-scene embedded arjs>
+    <a-marker preset="hiro" emitevents="true" cursor="rayOrigin: mouse">
+      <a-entity id="3d-model" position="0 0 0" rotation="0 0 0" scale="0.005 0.005 0.005" gltf-model="./assets/duck.gltf"></a-entity>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
 </html>
