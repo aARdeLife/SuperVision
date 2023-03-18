@@ -53,9 +53,3 @@ const updateKNN = () => {
 
 const updateLabel = () => {
   const labelElement
-const updateLabel = () => {
-  const labelElement = document.querySelector('#label');
-  if (labelElement && label) {
-    labelElement.innerHTML = `Label: ${label}`;
-  }
-};
