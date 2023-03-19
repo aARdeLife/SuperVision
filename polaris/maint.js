@@ -6,6 +6,14 @@ let modelReady = false;
 let knnReady = false;
 let predicting = false;
 
+let scene;
+let camera;
+let renderer;
+let arToolkitSource;
+let arToolkitContext;
+
+let mesh;
+
 const setup = async () => {
   video = document.createElement('video');
   video.width = 224;
@@ -29,27 +37,47 @@ const setup = async () => {
   });
 
   knnReady = true;
+
+  initAR();
+  animate();
 };
 
-const update = async () => {
-  if (modelReady && knnReady) {
-    const activation = net.infer(video, 'conv_preds');
-    const result = await classifier.predictClass(activation);
+const initAR = () => {
+  scene = new THREE.Scene();
+  camera = new THREE.Camera();
+  scene.add(camera);
 
-    label = result.label;
-    updateKNN();
-    updateLabel();
-  }
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true
+  });
 
-  requestAnimationFrame(update);
+  renderer.setClearColor(new THREE.Color('lightgrey'), 0);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  arToolkitSource = new THREEx.ArToolkitSource({
+    sourceType: 'webcam',
+  });
+
+  arToolkitContext = new THREEx.ArToolkitContext({
+    cameraParametersUrl: 'data/camera_para.dat',
+    detectionMode: 'mono',
+  });
+
+  arToolkitSource.init(() => {
+    setTimeout(() => {
+      onResize();
+    }, 2000);
+  });
+
+  window.addEventListener('resize', onResize);
+
+  add3DModel();
+  initClickHandler();
 };
 
-const updateKNN = () => {
-  if (label && predicting) {
-    classifier.addExample(net.infer(video, 'conv_preds'), label);
-    predicting = false;
-  }
-};
-
-const updateLabel = () => {
-  const labelElement
+const onResize = () => {
+  arToolkitSource.onResizeElement();
+  arToolkitSource.copyElementSizeTo(renderer.domElement);
+  arToolkitContext.arController && arToolkitContext.arController.canvas && arToolkit
