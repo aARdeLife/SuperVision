@@ -2,18 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Vision XR</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Object Detection with 3D Model</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; }
+        #video { display: none; }
+    </style>
 </head>
 <body>
-    <video id="introVideo" src="https://github.com/aARdeLife/spacetimeXR/blob/e0350bdd7778f976d79b44b655ea5d3f7532003e/intro.mp4?raw=true" preload="auto" playsinline autoplay muted></video>
-    <video id="video" autoplay muted playsinline style="display: none;"></video>
-    <canvas id="canvas" style="display: none;"></canvas>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <video id="video" width="640" height="480" autoplay muted playsinline></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div id="tooltip" style="display:none; position: absolute; z-index: 2; /* Add your custom styles here */"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.12.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
