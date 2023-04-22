@@ -1,106 +1,173 @@
-require('dotenv').config();
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let model;
+let tooltip = document.getElementById("tooltip");
 
-const introVideo = document.createElement('video');
-introVideo.src = 'intro.mp4';
-introVideo.autoplay = true;
-introVideo.onended = initializeApp;
-document.body.appendChild(introVideo);
+// Three.js setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.style.position = 'absolute';
+renderer.domElement.style.top = 0;
+renderer.domElement.style.zIndex = 1;
+document.body.appendChild(renderer.domElement);
 
-async function initializeApp() {
+const loader = new THREE.GLTFLoader();
+let object3D;
 
-  document.body.removeChild(introVideo);
+loader.load('https://raw.githubusercontent.com/aARdeLife/www/24c418c270c508983064244597f661b3791889a8/polforweb%20(3).glb', function (gltf) {
+  object3D = gltf.scene;
+  object3D.visible = false;
+  scene.add(object3D);
+  camera.position.z = 5;
+}, undefined, function (error) {
+  console.error(error);
+});
 
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  const summaryBox = document.createElement('div');
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
 
-  summaryBox.style.position = 'absolute';
-  summaryBox.style.padding = '10px';
-  summaryBox.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-  summaryBox.style.color = 'white';
-  summaryBox.style.borderRadius = '5px';
-  summaryBox.style.fontSize = '14px';
-  summaryBox.style.maxWidth = '250px';
-  summaryBox.style.display = 'none';
+animate();
 
-  document.body.appendChild(summaryBox);
+canvas.addEventListener("mousemove", (event) => {
+  handleTooltip(event);
+});
 
-  async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-    video.srcObject = stream;
-    return new Promise(resolve => {
-      video.onloadedmetadata = () => {
-        resolve(video);
-      };
-    });
-  }
+canvas.addEventListener("mouseout", () => {
+  hideTooltip();
+});
 
-  function isPointInRect(x, y, rect) {
-    return x >= rect[0] && x <= rect[0] + rect[2] && y >= rect[1] && y <= rect[1] + rect[3];
-  }
-
-  async function fetchWikipediaSummary(title) {
-    const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
-    if (response.ok) {
-      const data = await response.json();
-      return data.extract;
-    } else {
-      return 'No summary available';
-    }
-  }
-
-  canvas.addEventListener('click', async event => {
+canvas.addEventListener("click", (event) => {
+  if (object3D) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+    object3D.position.set(x / 100, -y / 100, 0);
+    object3D.visible = true;
+  }
+});
 
-    for (const prediction of currentPredictions) {
-      if (isPointInRect(x, y, prediction.bbox)) {
-        const summary = await fetchWikipediaSummary(prediction.class);
-        summaryBox.style.display = 'block';
-        summaryBox.style.left = `${prediction.bbox[0] + prediction.bbox[2]}px`;
-        summaryBox.style.top = `${prediction.bbox[1]}px`;
-        summaryBox.textContent = summary;
-        return;
-      }
-    }
+async function loadModel() {
+  model = await cocoSsd.load();
+  console.log("Model loaded");
+  detectFrame(video, model);
+}
 
-    summaryBox.style.display = 'none';
+function startVideo() {
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let model;
+let tooltip = document.getElementById("tooltip");
+
+// Three.js setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.style.position = 'absolute';
+renderer.domElement.style.top = 0;
+renderer.domElement.style.zIndex = 1;
+document.body.appendChild(renderer.domElement);
+
+const loader = new THREE.GLTFLoader();
+let object3D;
+
+loader.load('https://raw.githubusercontent.com/aARdeLife/www/24c418c270c508983064244597f661b3791889a8/polforweb%20(3).glb', function (gltf) {
+  object3D = gltf.scene;
+  object3D.visible = false;
+  scene.add(object3D);
+  camera.position.z = 5;
+}, undefined, function (error) {
+  console.error(error);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+
+animate();
+
+canvas.addEventListener("mousemove", (event) => {
+  handleTooltip(event);
+});
+
+canvas.addEventListener("mouseout", () => {
+  hideTooltip();
+});
+
+canvas.addEventListener("click", (event) => {
+  if (object3D) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    object3D.position.set(x / 100, -y / 100, 0);
+    object3D.visible = true;
+  }
+});
+
+async function loadModel() {
+  model = await cocoSsd.load();
+  console.log("Model loaded");
+  detectFrame(video, model);
+}
+
+function startVideo() {
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: "environment" } })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.addEventListener("loadeddata", loadModel);
+    })
+    .catch((error) => {
+      console.error("Error accessing camera:", error);
+    });
+}
+
+function detectFrame(video, model) {
+  model.detect(video).then((predictions) => {
+    renderPredictions(predictions);
+    requestAnimationFrame(() => {
+      detectFrame(video, model);
+    });
   });
+}
 
-  async function detectObjects() {
-    const model = await cocoSsd.load();
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+function renderPredictions(predictions) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.font = "18px Arial";
+  ctx.fillStyle = "red";
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 2;
+  predictions.forEach((prediction) => {
+    const x = prediction.bbox[0];
+    const y = prediction.bbox[1];
+    const width = prediction.bbox[2];
+    const height = prediction.bbox[3];
+    ctx.strokeRect(x, y, width, height);
+    ctx.fillText(prediction.class, x, y);
+  });
+}
 
-    // Initialize currentPredictions as an empty array
-    currentPredictions = [];
-
-    while (true) {
-      const predictions = await model.detect(video);
-      currentPredictions = predictions;
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-      predictions.forEach(prediction => {
-        const opacity = Math.min(1, (prediction.score * 2)).toFixed(2);
-        ctx.strokeStyle = `rgba(255, 255, 0, ${opacity})`;
-        ctx.lineWidth = 4;
-        ctx.strokeRect(...prediction.bbox);
-      });
-
-      await tf.nextFrame();
-    }
+function handleTooltip(event) {
+  if (!model) {
+    return;
   }
 
-  video.setAttribute('playsinline', true);
-  video.addEventListener('loadedmetadata', async () => {
-    const videoElement = await setupCamera();
-    videoElement
-      .play()
-      .then(() => {
-        detectObjects();
-      });
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  const prediction = model.detect(canvas).find((pred) => {
+    const [px, py, width, height] = pred.bbox;
+    return x >= px && x <= px + width && y >= py && y <= py + height;
   });
 
-})();
+  if
