@@ -92,10 +92,14 @@ async function initializeApp() {
     }
   }
 
-  const videoElement = await setupCamera();
-  videoElement
-  .play()
-  .then(() => {
-    detectObjects();
+  video.setAttribute('playsinline', true);
+  video.addEventListener('loadedmetadata', async () => {
+    const videoElement = await setupCamera();
+    videoElement
+      .play()
+      .then(() => {
+        detectObjects();
+      });
   });
+
 })();
