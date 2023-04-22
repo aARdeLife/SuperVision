@@ -170,4 +170,22 @@ function handleTooltip(event) {
     return x >= px && x <= px + width && y >= py && y <= py + height;
   });
 
-  if
+    if (prediction) {
+    tooltip.style.display = "block";
+    tooltip.style.left = `${event.pageX}px`;
+    tooltip.style.top = `${event.pageY}px`;
+
+    const info = `Class: ${prediction.class}\nScore: ${prediction.score.toFixed(2)}`;
+
+    tooltip.textContent = info;
+  } else {
+    hideTooltip();
+  }
+}
+
+function hideTooltip() {
+  tooltip.style.display = "none";
+}
+
+startVideo();
+
