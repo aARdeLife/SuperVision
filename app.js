@@ -6,7 +6,8 @@ introVideo.autoplay = true;
 introVideo.onended = initializeApp;
 document.body.appendChild(introVideo);
 
-async function initializeApp.() {
+async function initializeApp() {
+
   document.body.removeChild(introVideo);
 
   const video = document.getElementById('video');
