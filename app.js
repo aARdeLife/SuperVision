@@ -83,8 +83,8 @@ async function render3DModel() {
 
     const scene = document.createElement('a-scene');
     scene.setAttribute('embedded', '');
-    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
-    scene.setAttribute('vr-mode-ui', 'enabled: false');
+    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: true;');
+    scene.setAttribute('vr-mode-ui', 'enabled: true');
 
     const camera = document.createElement('a-entity');
     camera.setAttribute('gps-camera', '');
